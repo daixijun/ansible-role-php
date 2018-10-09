@@ -1,0 +1,52 @@
+---
+- name: Requirements
+  fail:
+    msg: "php_verison must greater 7.0"
+  when: php_verison is version("7.0", operator="lt", strict=True)
+
+- name: Install dependencies
+  yum:
+    name: '{{ php_dependencies }}'
+    state: present
+    update_cache: yes
+
+- name: Ensure group {{ php_group }} exists
+  group:
+    name: '{{ php_group }}'
+    state: present
+    system: yes
+
+- name: Ensure user {{ php_user }} exists
+  user:
+    name: '{{ php_user }}'
+    group: '{{ php_group }}'
+    createhome: yes
+    home: /var/cache/'{{ php_user }}'
+    move_home: yes
+    shell: /sbin/nologin
+    system: yes
+
+- name: Check php is installed
+  stat:
+    path: /usr/local/php/bin/php
+  register: php_stat
+
+- name: Unarchive php-{{ php_version }} from url
+  unarchive:
+    src: http://cn2.php.net/get/php-{{ php_version }}.tar.gz/from/this/mirror
+    dest: /usr/local/src/
+    creates: /usr/local/src/php-{{ php_version }}
+    remote_src: yes
+  when: not php_stat.exists
+
+- name: Build && Install
+  shell: '{{ php_build_parameters }}'
+  args:
+    chdir: /usr/local/src/php-{{ php_version }}
+
+- name: Symlink
+  file:
+    src: /usr/local/php-{{ php_version }}
+    dest: /usr/local/php
+    state: link
+    force: yes
