@@ -1,8 +1,8 @@
 ---
 - name: Requirements
   fail:
-    msg: "php_verison must greater 7.0"
-  when: php_verison is version("7.0", operator="lt", strict=True)
+    msg: "php_version must greater 7.0"
+  when: php_version is version("7.0", operator="lt", strict=True)
 
 - name: Install dependencies
   yum:
