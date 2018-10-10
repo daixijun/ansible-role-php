@@ -37,12 +37,16 @@
     dest: /usr/local/src/
     creates: /usr/local/src/php-{{ php_version }}
     remote_src: yes
-  when: not php_stat.exists
+  register: unarchive
+  when: not php_stat.stat.exists
 
 - name: Build && Install
   shell: '{{ php_build_parameters }}'
   args:
     chdir: /usr/local/src/php-{{ php_version }}
+  when: 
+    - not php_stat.stat.exists
+    - unarchive is success
 
 - name: Symlink
   file:
