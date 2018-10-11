@@ -23,10 +23,13 @@ php_dependencies:
   # - openldap-devel
   - bison-devel
   - libevent-devel
+  - systemd-devel
+  - libicu-devel
 php_build_parameters: |
   ./configure --prefix=/usr/local/php-{{ php_version }} \
     --with-fpm-acl \
-    --enable-exif \
+    --with-fpm-systemd \
+    --enable-intl \
     --enable-mbstring \
     --enable-fpm \
     --enable-pdo \
@@ -39,7 +42,6 @@ php_build_parameters: |
     --enable-zip \
     --with-pcre-regex \
     --with-gd \
-    --with-mcrypt \
     --with-mysqli \
     --with-pdo-mysql \
     --enable-mysqlnd \
@@ -53,14 +55,10 @@ php_build_parameters: |
     --enable-xml \
     --with-gettext \
     --with-curl \
-    --enable-gd-native-ttf \
     --enable-opcache \
     --with-iconv \
     --with-pcre-dir \
     --with-readline \
-    # --enable-wddx \
-    # --enable-shmop \
-    # --enable-soap \
     --enable-dba \
     --enable-ftp \
     --with-openssl \
