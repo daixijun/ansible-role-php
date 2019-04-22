@@ -1,0 +1,20 @@
+---
+sudo: required
+language: python
+services:
+  - docker
+
+before_script:
+  - cd ../
+  - mv ansible-role-php daixijun.php
+  - cd daixijun.php
+
+install:
+  - pip install ansible molecule docker
+
+script:
+  - molecule test
+
+notifications:
+  webhooks:
+    - https://galaxy.ansible.com/api/v1/notifications/

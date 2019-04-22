@@ -1,8 +1,39 @@
 ---
-php_version: 7.2.10
-php_user: nginx
-php_group: nginx
+php_version: 7.2.17
+php_force_install: false
+
+php_max_execution_time: 10
+php_log_path: /var/log/nginx
+php_date_timezone: Asia/Shanghai
+php_session_save_handler: files
+php_session_save_path: /tmp/
+php_opcache_enable_cli: false
+php_opcache_enable: true
+
+php_memory_limit: 128M
+
+php_fpm_listen: 127.0.0.1:9000
+php_fpm_listen_backlog: 511
+php_fpm_listen_allowed_clients: 127.0.0.1
+php_fpm_pm: dynamic  # static
+php_fpm_pm_max_children: 50
+php_fpm_pm_start_servers: 2
+php_fpm_pm_min_spare_servers: 1
+php_fpm_pm_max_spare_servers: 3
+php_fpm_pm_process_idle_timeout: 10s
+php_fpm_pm_max_requests: 5000
+
+php_fpm_request_slowlog_timeout: 3
+php_fpm_request_terminate_timeout: 10
+php_fpm_catch_workers_output: "yes"
+
+php_fpm_pid: /var/run/nginx/php-fpm.pid
 php_dependencies:
+  - gcc
+  - gcc-c++
+  - autoconf
+  - automake
+  - make
   - libxml2-devel
   - bzip2-devel
   - libzip-devel
@@ -15,12 +46,9 @@ php_dependencies:
   - openssl-devel
   - freetype-devel
   - msgpack-devel
-  # - cyrus-sasl-devel
-  # - cyrus-sasl-plain
   - libacl-devel
   - gd-devel
   - libwebp-devel
-  # - openldap-devel
   - bison-devel
   - libevent-devel
   - systemd-devel
@@ -62,8 +90,8 @@ php_build_parameters: |
     --enable-dba \
     --enable-ftp \
     --with-openssl \
-    --with-fpm-user={{ php_user }} \
-    --with-fpm-group={{ php_group }} \
+    --with-fpm-user=nginx \
+    --with-fpm-group=nginx \
     --with-config-file-scan-dir=/usr/local/php-{{ php_version }}/etc/php.d \
     --with-config-file-path=/usr/local/php-{{ php_version }}/etc/php.ini \
   && make && make install

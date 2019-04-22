@@ -1,0 +1,7 @@
+---
+- name: Converge
+  hosts: all
+  roles:
+    - role: daixijun.php
+    #   php_version: 7.3.4
+    #   php_force_install: true

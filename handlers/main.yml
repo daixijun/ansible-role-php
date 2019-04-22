@@ -1,2 +1,8 @@
 ---
-# handlers file for php7
+# handlers file for php
+- name: restart php-fpm
+  systemd:
+    name: php-fpm
+    daemon_reload: true
+    enabled: true
+    state: restarted

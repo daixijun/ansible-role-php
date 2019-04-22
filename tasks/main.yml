@@ -1,52 +1,64 @@
 ---
-- name: Requirements
-  fail:
-    msg: "php_version must greater 7.0"
-  when: php_version is version("7.0", operator="lt", strict=True)
+- import_tasks: check.yaml
 
 - name: Install dependencies
   yum:
     name: '{{ php_dependencies }}'
     state: present
     update_cache: yes
+  when:
+    - php_force_install or not php_installed_stat.stat.exists
 
-- name: Ensure group {{ php_group }} exists
+- name: Ensure nginx group exists
   group:
-    name: '{{ php_group }}'
+    name: nginx
+    system: yes
     state: present
-    system: yes
+  tags:
+    - user
 
-- name: Ensure user {{ php_user }} exists
+- name: Ensure nginx user exists
   user:
-    name: '{{ php_user }}'
-    group: '{{ php_group }}'
-    createhome: yes
-    home: /var/cache/'{{ php_user }}'
-    move_home: yes
+    name: nginx
     shell: /sbin/nologin
+    home: /var/cache/nginx
     system: yes
+    group: nginx
+    move_home: yes
+    state: present
+  tags:
+    - user
 
-- name: Check php is installed
-  stat:
-    path: /usr/local/php/bin/php
-  register: php_stat
+- name: Ensure log directory
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: nginx
+    group: nginx
+  loop:
+    - "{{ php_log_path }}"
+    - "{{ php_fpm_pid | dirname }}"
 
-- name: Unarchive php-{{ php_version }} from url
+- name: Unarchive php-{{ php_version }} source from remote
   unarchive:
-    src: http://cn2.php.net/get/php-{{ php_version }}.tar.gz/from/this/mirror
+    src: https://verystar.oss-cn-hangzhou.aliyuncs.com/software/php/php-{{ php_version }}.tar.gz
     dest: /usr/local/src/
     creates: /usr/local/src/php-{{ php_version }}
     remote_src: yes
   register: unarchive
-  when: not php_stat.stat.exists
+  when:
+    - php_force_install or not php_installed_stat.stat.exists
 
-- name: Build && Install
+- name: Compile and Install
   shell: '{{ php_build_parameters }}'
   args:
     chdir: /usr/local/src/php-{{ php_version }}
-  when: 
-    - not php_stat.stat.exists
-    - unarchive is success
+  register: php_build_status
+  when:
+    - php_force_install or not php_installed_stat.stat.exists
+    - unarchive is succeeded
+  tags:
+    - skip_ansible_lint
 
 - name: Symlink
   file:
@@ -54,3 +66,41 @@
     dest: /usr/local/php
     state: link
     force: yes
+  when:
+    - php_force_install or not php_installed_stat.stat.exists
+    - php_build_status is succeeded
+
+- name: Copy php-fpm configuration files
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+  loop:
+    - src: php.ini.j2
+      dest: /usr/local/php/etc/php.ini
+    - src: php-fpm.conf.j2
+      dest: /usr/local/php/etc/php-fpm.conf
+    - src: www.conf.j2
+      dest: /usr/local/php/etc/php-fpm.d/www.conf
+  notify:
+    - restart php-fpm
+
+- name: Add php environment variable to profile
+  blockinfile:
+    create: true
+    dest: /etc/profile.d/php.sh
+    block: |
+      export PATH=/usr/local/php/bin:$PATH
+      export PHPRC=/usr/local/php/etc/php.ini
+      export PHP_INI_SCAN_DIR=/usr/local/php/etc/php.d
+
+- name: startup for systemd
+  template:
+    src: php-fpm.service.j2
+    dest: /usr/lib/systemd/system/php-fpm.service
+
+- name: Ensure php-fpm.service started
+  systemd:
+    name: php-fpm.service
+    state: started
+    enabled: yes
+    daemon_reload: yes
