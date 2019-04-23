@@ -1,6 +1,7 @@
 Role Name
 =========
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/aa8233b02123488a88257f76908967f4)](https://app.codacy.com/app/daixijun/ansible-role-php?utm_source=github.com&utm_medium=referral&utm_content=daixijun/ansible-role-php&utm_campaign=Badge_Grade_Settings)
 [![Build Status](https://travis-ci.org/daixijun/ansible-role-php.svg?branch=master)](https://travis-ci.org/daixijun/ansible-role-php)
 
 Ansible 源码安装php
