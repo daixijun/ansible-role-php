@@ -1,5 +1,5 @@
 ---
-- import_tasks: check.yaml
+- import_tasks: prepare.yaml
 
 - name: Install dependencies
   yum:
@@ -38,6 +38,7 @@
   loop:
     - "{{ php_log_path }}"
     - "{{ php_fpm_pid | dirname }}"
+    - "/usr/local/php/etc/php.d"
 
 - name: Unarchive php-{{ php_version }} source from remote
   unarchive:
@@ -104,3 +105,5 @@
     state: started
     enabled: yes
     daemon_reload: yes
+
+- import_tasks: post_task.yaml

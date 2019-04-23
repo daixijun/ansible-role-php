@@ -1,0 +1,11 @@
+---
+- name: Get extension directory
+  command: /usr/local/php/bin/php-config --extension-dir
+  register: get_extension_dir
+  changed_when: false
+  tags:
+    - skip_ansible_lint
+
+- name: Set extension_dir fact
+  set_fact:
+    php_extension_dir: "{{ get_extension_dir.stdout.strip() }}"

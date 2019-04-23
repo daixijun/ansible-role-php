@@ -17,3 +17,12 @@ def test_listening(host):
     s = host.socket('tcp://127.0.0.1:9000')
 
     assert s.is_listening
+
+
+def test_phpd_directory(host):
+    d = host.file('/usr/local/php/etc/php.d')
+
+    assert d.exists
+    assert d.is_directory
+    assert d.user == "nginx"
+    assert d.group == "nginx"

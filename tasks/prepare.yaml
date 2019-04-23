@@ -11,42 +11,38 @@
 
 - name: Get installed version
   raw: /usr/local/php/bin/php --version | head -1 | awk '{print $2}'
-  register: php_installed_version
+  register: get_php_installed_version
   changed_when: false
   when:
     - php_installed_stat.stat.exists
   tags:
     - skip_ansible_lint
 
-# - name: Compare version
-#   set_fact:
-#     php_need_install: false
-#   when:
-#     - php_installed_stat.stat.exists
-#     - php_installed_version is defined
-#     - php_installed_version.stdout.strip() is version(php_version, operator="eq", strict=True)
-#     - not php_force_install
+- name: Set php_installed_version fact
+  set_fact:
+    php_installed_version: "{{ get_php_installed_version.stdout.strip() }}"
+  when:
+    - php_installed_stat.stat.exists
+    - get_php_installed_version is defined
+    - "'stdout' in get_php_installed_version"
 
 - name: Remove installed same version
   file:
     path: /usr/local/php-{{ php_version }}
     state: absent
   when:
-    - php_installed_stat.stat.exists
     - php_force_install
     - php_installed_version is defined
-    - "'stdout' in php_installed_version"
-    - php_installed_version.stdout.strip() is version(php_version, operator="eq", strict=True)
+    - php_installed_version is version(php_version, operator="eq", strict=True)
   tags:
     - skip_ansible_lint
 
 - name: Message for PHP already installed
   debug:
-    msg: "expected version {{ php_version }} but {{ php_installed_version.stdout.strip() }} already installed. set php_force_install parameter to force reinstall"  # noqa 204
+    msg: "expected version {{ php_version }} but {{ php_installed_version }} already installed. set php_force_install parameter to force reinstall"  # noqa 204
   changed_when: true
   when:
     - php_installed_stat.stat.exists
     - not php_force_install
     - php_installed_version is defined
-    - "'stdout' in php_installed_version"
-    - not php_installed_version.stdout.strip() is version(php_version, operator="eq", strict=True)
+    - not php_installed_version is version(php_version, operator="eq", strict=True)
