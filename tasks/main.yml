@@ -29,17 +29,6 @@
   tags:
     - user
 
-- name: Ensure log directory
-  file:
-    path: "{{ item }}"
-    state: directory
-    owner: nginx
-    group: nginx
-  loop:
-    - "{{ php_log_path }}"
-    - "{{ php_fpm_pid | dirname }}"
-    - "/usr/local/php/etc/php.d"
-
 - name: Unarchive php-{{ php_version }} source from remote
   unarchive:
     src: https://verystar.oss-cn-hangzhou.aliyuncs.com/software/php/php-{{ php_version }}.tar.gz
@@ -70,6 +59,17 @@
   when:
     - php_force_install or not php_installed_stat.stat.exists
     - php_build_status is succeeded
+
+- name: Ensure log directory
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: nginx
+    group: nginx
+  loop:
+    - "{{ php_log_path }}"
+    - "{{ php_fpm_pid | dirname }}"
+    - "/usr/local/php/etc/php.d"
 
 - name: Copy php-fpm configuration files
   template:
