@@ -54,6 +54,7 @@ php_dependencies:
   - libevent-devel
   - systemd-devel
   - libicu-devel
+  - mariadb-devel
 php_build_parameters: |
   ./configure --prefix=/usr/local/php-{{ php_version }} \
     --with-fpm-acl \
