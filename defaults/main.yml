@@ -91,6 +91,7 @@ php_build_parameters: |
     --with-readline \
     --enable-dba \
     --enable-ftp \
+    --enable-soap \
     --with-openssl \
     --with-fpm-user=nginx \
     --with-fpm-group=nginx \
