@@ -6,8 +6,17 @@
     name: '{{ php_dependencies }}'
     state: present
     update_cache: yes
-  when:
-    - php_force_install or not php_installed_stat.stat.exists
+  async: 300
+  poll: 0
+  changed_when: False
+  register: php_install_dependencies
+
+- name: Wait for dependencies install complete
+  async_status:
+    jid: "{{ php_install_dependencies.ansible_job_id }}"
+  register: php_install_dependencies_status
+  until: php_install_dependencies_status.finished
+  retries: 300
 
 - name: Ensure nginx group exists
   group:
@@ -34,7 +43,7 @@
     src: "{{ php_download_url }}"
     dest: /usr/local/src/
     creates: /usr/local/src/php-{{ php_version }}
-    remote_src: yes
+    remote_src: "{% if php_download_url.startswith('/') %}False{% else %}True{% endif %}"
   register: unarchive
   when:
     - php_force_install or not php_installed_stat.stat.exists
@@ -43,12 +52,24 @@
   shell: '{{ php_build_parameters }}'
   args:
     chdir: /usr/local/src/php-{{ php_version }}
+  async: 600
+  poll: 0
   register: php_build_status
   when:
     - php_force_install or not php_installed_stat.stat.exists
     - unarchive is succeeded
   tags:
     - skip_ansible_lint
+
+- name: Wait for complie/install complete
+  async_status:
+    jid: "{{ php_build_status.ansible_job_id }}"
+  register: php_build_statuses
+  until: php_build_statuses.finished
+  retries: 600
+  when:
+    - php_build_status is defined
+    - php_build_status is changed
 
 - name: Symlink
   file:
@@ -58,7 +79,7 @@
     force: yes
   when:
     - php_force_install or not php_installed_stat.stat.exists
-    - php_build_status is succeeded
+    - php_build_status is changed
 
 - name: Ensure log directory
   file:
