@@ -43,7 +43,7 @@
     src: "{{ php_download_url }}"
     dest: /usr/local/src/
     creates: /usr/local/src/php-{{ php_version }}
-    remote_src: "{% if php_download_url.startswith('/') %}False{% else %}True{% endif %}"
+    remote_src: yes
   register: unarchive
   when:
     - php_force_install or not php_installed_stat.stat.exists
