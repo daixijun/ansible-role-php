@@ -97,5 +97,6 @@ php_build_parameters: |
     --with-fpm-user=nginx \
     --with-fpm-group=nginx \
     --with-config-file-scan-dir=/usr/local/php-{{ php_version }}/etc/php.d \
-    --with-config-file-path=/usr/local/php-{{ php_version }}/etc/php.ini \
-  && make && make install
+    --with-config-file-path=/usr/local/php-{{ php_version }}/etc/php.ini && \
+  make && \
+  make install

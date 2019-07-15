@@ -46,7 +46,7 @@
     remote_src: "{{ php_remote_src }}"
   register: unarchive
   when:
-    - php_force_install or not php_installed_stat.stat.exists
+    - php_force_install|bool or not php_installed_stat.stat.exists
 
 - name: Compile and Install
   shell: '{{ php_build_parameters }}'
@@ -55,8 +55,9 @@
   async: 600
   poll: 0
   register: php_build_status
+  changed_when: False
   when:
-    - php_force_install or not php_installed_stat.stat.exists
+    - php_force_install|bool or not php_installed_stat.stat.exists
     - unarchive is succeeded
   tags:
     - skip_ansible_lint
@@ -69,7 +70,7 @@
   retries: 600
   when:
     - php_build_status is defined
-    - php_build_status is changed
+    - php_build_status is successed
 
 - name: Symlink
   file:
@@ -78,8 +79,7 @@
     state: link
     force: yes
   when:
-    - php_force_install or not php_installed_stat.stat.exists
-    - php_build_status is changed
+    - php_force_install|bool or not php_installed_stat.stat.exists
 
 - name: Ensure log directory
   file:
