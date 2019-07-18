@@ -70,7 +70,7 @@
   retries: 600
   when:
     - php_build_status is defined
-    - php_build_status is successed
+    - php_build_status is succeeded
 
 - name: Symlink
   file:
