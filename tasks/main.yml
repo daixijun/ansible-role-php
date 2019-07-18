@@ -70,7 +70,7 @@
   retries: 600
   when:
     - php_build_status is defined
-    - php_build_status is succeeded
+    - "'ansible_job_id' in php_build_status"
 
 - name: Symlink
   file:
