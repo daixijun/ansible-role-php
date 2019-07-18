@@ -18,21 +18,21 @@
   until: php_install_dependencies_status.finished
   retries: 300
 
-- name: Ensure nginx group exists
+- name: Ensure {{ php_web_user }} group exists
   group:
-    name: nginx
+    name: "{{ php_web_user }}"
     system: yes
     state: present
   tags:
     - user
 
-- name: Ensure nginx user exists
+- name: Ensure {{ php_web_user }} user exists
   user:
-    name: nginx
+    name: "{{ php_web_user }}"
     shell: /sbin/nologin
     home: /var/cache/nginx
     system: yes
-    group: nginx
+    group: "{{ php_web_user }}"
     move_home: yes
     state: present
   tags:
@@ -85,8 +85,8 @@
   file:
     path: "{{ item }}"
     state: directory
-    owner: nginx
-    group: nginx
+    owner: "{{ php_web_user }}"
+    group: "{{ php_web_user }}"
   loop:
     - "{{ php_log_path }}"
     - "{{ php_fpm_pid | dirname }}"
