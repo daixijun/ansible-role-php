@@ -3,6 +3,7 @@
   command: /usr/local/php/bin/php-config --extension-dir
   register: get_extension_dir
   changed_when: false
+  check_mode: no
   tags:
     - skip_ansible_lint
 
