@@ -91,10 +91,11 @@
     state: directory
     owner: "{{ php_web_user }}"
     group: "{{ php_web_user }}"
+    mode: '755'
   loop:
     - "{{ php_log_path }}"
     - "{{ php_fpm_pid | dirname }}"
-    - "/usr/local/php/etc/php.d"
+    - "/usr/local/php-{{ php_version }}/etc/php.d"
 
 - name: Copy php-fpm configuration files
   template:
