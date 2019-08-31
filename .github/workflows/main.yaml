@@ -23,7 +23,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install ansible molecule docker
-          pip install --upgrade testinfr
+          pip install --upgrade testinfra
       - name: Change role name
         run: |
           cd ..
