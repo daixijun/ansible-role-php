@@ -4,7 +4,7 @@ on:
     branches:
       - master
 jobs:
-  molecule test:
+  test:
     runs-on: ubuntu-latest
     strategy:
       max-parallel: 4
