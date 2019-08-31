@@ -24,10 +24,9 @@ jobs:
           python -m pip install --upgrade pip
           pip install ansible molecule docker
           pip install --upgrade testinfra
-      - name: Change role name
+      - name: Test with molecule
         run: |
           cd ..
           mv ansible-role-php daixijun.php
           cd daixijun.php
-      - name: Test with molecule
-        run: molecule test
+          molecule --debug test
