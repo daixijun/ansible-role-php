@@ -38,9 +38,8 @@
     - skip_ansible_lint
 
 - name: Message for PHP already installed
-  debug:
-    msg: "expected version {{ php_version }} but {{ php_installed_version }} already installed. set php_force_install parameter to force reinstall"  # noqa 204
-  changed_when: true
+  fail:
+    msg: "expected version {{ php_version }} but {{ php_installed_version }} already installed. set php_force_install=true parameter to force reinstall"
   when:
     - php_installed_stat.stat.exists
     - not php_force_install

@@ -2,6 +2,8 @@
 php_version: 7.2.17
 php_web_user: nginx
 php_download_url: https://www.php.net/distributions/php-{{ php_version }}.tar.gz
+php_libzip_version: 1.3.2
+php_libzip_download_url: https://libzip.org/download/libzip-{{ php_libzip_version }}.tar.gz
 php_remote_src: true
 php_force_install: false
 
@@ -18,7 +20,7 @@ php_memory_limit: 128M
 php_fpm_listen: 127.0.0.1:9000
 php_fpm_listen_backlog: 511
 php_fpm_listen_allowed_clients: 127.0.0.1
-php_fpm_pm: dynamic  # static
+php_fpm_pm: dynamic # static
 php_fpm_pm_max_children: 50
 php_fpm_pm_start_servers: 2
 php_fpm_pm_min_spare_servers: 1
@@ -33,10 +35,13 @@ php_fpm_catch_workers_output: "yes"
 php_fpm_pid: /var/run/nginx/php-fpm.pid
 php_dependencies:
   - gcc
+  - re2c
   - gcc-c++
   - autoconf
   - automake
   - make
+  - bison
+  - bison-devel
   - libxml2-devel
   - bzip2-devel
   - libzip-devel
@@ -72,6 +77,8 @@ php_build_parameters: |
     --enable-bcmath \
     --with-mhash \
     --enable-zip \
+    --enable-wddx \
+    --with-libzip=/usr/local/libzip/ \
     --with-pcre-regex \
     --with-gd \
     --with-mysqli \
@@ -79,17 +86,11 @@ php_build_parameters: |
     --enable-mysqlnd \
     --without-sqlite3 \
     --without-pdo-sqlite \
-    --with-iconv-dir \
-    --with-freetype-dir \
-    --with-jpeg-dir \
-    --with-png-dir \
-    --with-libxml-dir \
     --enable-xml \
     --with-gettext \
     --with-curl \
     --enable-opcache \
     --with-iconv \
-    --with-pcre-dir \
     --with-readline \
     --enable-dba \
     --enable-ftp \
