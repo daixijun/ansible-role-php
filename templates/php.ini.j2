@@ -1350,7 +1350,7 @@ session.save_handler = {{ php_session_save_handler }}
 ; does not overwrite the process's umask.
 ; http://php.net/session.save-path
 ;session.save_path = "/tmp"
-session.save_path = "{{ php_session_save_path  }}"
+session.save_path = {{ php_session_save_path | quote }}
 
 ; Whether to use strict session mode.
 ; Strict session mode does not accept uninitialized session ID and regenerate
