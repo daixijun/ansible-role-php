@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.15](https://github.com/daixijun/ansible-role-php/compare/v0.1.14...v0.1.15) (2019-11-20)
+
+
+### Bug Fixes
+
+* 修复libzip判断逻辑 ([48155aa](https://github.com/daixijun/ansible-role-php/commit/48155aae9ef6ea106f9b5e16f60ee6a7ff62df86))
+
 ### [0.1.14](https://github.com/daixijun/ansible-role-php/compare/v0.1.13...v0.1.14) (2019-11-20)
 
 
