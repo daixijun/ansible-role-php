@@ -40,6 +40,11 @@
       tags:
         - user
 
+    - name: Verify that libzip is installed
+      stat:
+        path: /usr/local/libzip
+      register: libzip_install_stat
+
     - name: Unarchive libzip
       unarchive:
         src: "{{ php_libzip_download_url }}"
@@ -49,6 +54,7 @@
       register: libzip_unarchive
       when:
         - php_force_install|bool or not php_installed_stat.stat.exists
+        - libzip_install_stat.stat.exists
 
     - name: Install libzip
       shell: "{{ item }}"
