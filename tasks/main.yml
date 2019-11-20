@@ -54,7 +54,7 @@
       register: libzip_unarchive
       when:
         - php_force_install|bool or not php_installed_stat.stat.exists
-        - libzip_install_stat.stat.exists
+        - not libzip_install_stat.stat.exists
 
     - name: Install libzip
       shell: "{{ item }}"
