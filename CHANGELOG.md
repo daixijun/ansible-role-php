@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.16](https://github.com/daixijun/ansible-role-php/compare/v0.1.15...v0.1.16) (2019-11-20)
+
+
+### Bug Fixes
+
+* 为 session.save_path 添加引号,防止变量解析错误 ([d76b0e5](https://github.com/daixijun/ansible-role-php/commit/d76b0e515458dc556e3f5d5a5e05d8be466166a6))
+
 ### [0.1.15](https://github.com/daixijun/ansible-role-php/compare/v0.1.14...v0.1.15) (2019-11-20)
 
 
