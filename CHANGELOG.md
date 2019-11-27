@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.17](https://github.com/daixijun/ansible-role-php/compare/v0.1.16...v0.1.17) (2019-11-27)
+
+
+### Features
+
+* 添加 --enable-pcntl 参数 ([b6ac07b](https://github.com/daixijun/ansible-role-php/commit/b6ac07bc20e5826316fab904d5c14e35488e4d49))
+
 ### [0.1.16](https://github.com/daixijun/ansible-role-php/compare/v0.1.15...v0.1.16) (2019-11-20)
 
 
