@@ -95,6 +95,7 @@ php_build_parameters: |
     --enable-dba \
     --enable-ftp \
     --enable-soap \
+    --enable-pcntl \
     --with-openssl \
     --with-fpm-user={{ php_web_user }} \
     --with-fpm-group={{ php_web_user }} \
