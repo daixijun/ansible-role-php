@@ -32,7 +32,7 @@ php_fpm_request_slowlog_timeout: 3
 php_fpm_request_terminate_timeout: 10
 php_fpm_catch_workers_output: "yes"
 
-php_fpm_pid: /var/run/nginx/php-fpm.pid
+php_fpm_pid: /var/run/php-fpm.pid
 php_dependencies:
   - gcc
   - re2c
