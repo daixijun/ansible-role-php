@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.18](https://github.com/daixijun/ansible-role-php/compare/v0.1.17...v0.1.18) (2019-11-28)
+
+
+### Bug Fixes
+
+* 修改 php_fpm_pid 默认路径为 /var/run/php-fpm.pid ([bf18b35](https://github.com/daixijun/ansible-role-php/commit/bf18b355396bc55746557955753304c8f624f847))
+
 ### [0.1.17](https://github.com/daixijun/ansible-role-php/compare/v0.1.16...v0.1.17) (2019-11-27)
 
 
