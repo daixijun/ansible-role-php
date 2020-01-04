@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.19](https://github.com/daixijun/ansible-role-php/compare/v0.1.18...v0.1.19) (2020-01-04)
+
+
+### Features
+
+* 修改安装包下载逻辑 ([fb941b1](https://github.com/daixijun/ansible-role-php/commit/fb941b10ed95bf1c8d2ca06c8ee5425b95872423))
+
 ### [0.1.18](https://github.com/daixijun/ansible-role-php/compare/v0.1.17...v0.1.18) (2019-11-28)
 
 
