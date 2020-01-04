@@ -86,6 +86,7 @@
       delegate_to: localhost
       when:
         - not _php_package_stat.stat.exists
+        - not php_installed_stat.stat.exists
       register: _php_package
 
     - name: Unarchive php-{{ php_version }}
