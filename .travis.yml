@@ -4,7 +4,7 @@ sudo: required
 language: python
 services:
   - docker
-python: '3.7'
+python: "3.7"
 
 before_script:
   - cd ../
@@ -19,5 +19,6 @@ script:
   - molecule test
 
 notifications:
+  email: false
   webhooks:
     - https://galaxy.ansible.com/api/v1/notifications/
