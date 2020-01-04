@@ -16,7 +16,7 @@
         jid: "{{ yum_sleeper.ansible_job_id }}"
       register: yum_sleeper_job_result
       until: yum_sleeper_job_result.finished
-      retries: 60
+      retries: 300
       when:
         - yum_sleeper is not skipped
 
