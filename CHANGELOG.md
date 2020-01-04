@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.21](https://github.com/daixijun/ansible-role-php/compare/v0.1.20...v0.1.21) (2020-01-04)
+
+
+### Features
+
+* 延长依赖安装时间 ([2606ff4](https://github.com/daixijun/ansible-role-php/commit/2606ff4ef93c51a0cfb56a28397beb42f4c05584))
+
 ### [0.1.20](https://github.com/daixijun/ansible-role-php/compare/v0.1.19...v0.1.20) (2020-01-04)
 
 
