@@ -69,15 +69,34 @@
       tags:
         - skip_ansible_lint
 
-    - name: Unarchive php-{{ php_version }} source from remote
+    - name: Check php package is already exists
+      stat:
+        path: "{{ role_path }}/files/{{ php_download_url | basename }}"
+      become: false
+      run_once: true
+      delegate_to: localhost
+      register: _php_package_stat
+
+    - name: Download php package
+      get_url:
+        url: "{{ php_download_url }}"
+        dest: "{{ role_path }}/files/"
+      become: false
+      run_once: true
+      delegate_to: localhost
+      when:
+        - not _php_package_stat.stat.exists
+      register: _php_package
+
+    - name: Unarchive php-{{ php_version }}
       unarchive:
-        src: "{{ php_download_url }}"
+        src: "files/{{ php_download_url | basename }}"
         dest: /usr/local/src/
         creates: /usr/local/src/php-{{ php_version }}
-        remote_src: "{{ php_remote_src }}"
+        remote_src: false
       register: php_unarchive
       when:
-        - php_force_install|bool or not php_installed_stat.stat.exists
+        - php_force_install|bool or _php_package is not skipped or (_php_package_stat.stat.exists and not php_installed_stat.stat.exists)
 
     - name: Compile and Install
       shell: "{{ php_build_parameters }}"
