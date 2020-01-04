@@ -45,16 +45,26 @@
         path: /usr/local/libzip
       register: libzip_install_stat
 
+    - name: Download libzip package
+      get_url:
+        url: "{{ php_libzip_download_url }}"
+        dest: "{{ role_path }}/files/"
+      become: false
+      run_once: true
+      delegate_to: localhost
+      register: _php_libzip_package
+      when:
+        - not libzip_install_stat.stat.exists
+
     - name: Unarchive libzip
       unarchive:
-        src: "{{ php_libzip_download_url }}"
+        src: "files/{{ php_libzip_download_url | basename }}"
         dest: /usr/local/src
         creates: /usr/local/src/libzip-{{ php_libzip_version }}
-        remote_src: true
+        remote_src: false
       register: libzip_unarchive
       when:
-        - php_force_install|bool or not php_installed_stat.stat.exists
-        - not libzip_install_stat.stat.exists
+        - not libzip_install_stat.stat.exists and _php_libzip_package is not skipped
 
     - name: Install libzip
       shell: "{{ item }}"
@@ -69,14 +79,6 @@
       tags:
         - skip_ansible_lint
 
-    - name: Check php package is already exists
-      stat:
-        path: "{{ role_path }}/files/{{ php_download_url | basename }}"
-      become: false
-      run_once: true
-      delegate_to: localhost
-      register: _php_package_stat
-
     - name: Download php package
       get_url:
         url: "{{ php_download_url }}"
@@ -85,7 +87,6 @@
       run_once: true
       delegate_to: localhost
       when:
-        - not _php_package_stat.stat.exists
         - not php_installed_stat.stat.exists
       register: _php_package
 
@@ -97,7 +98,7 @@
         remote_src: false
       register: php_unarchive
       when:
-        - php_force_install|bool or _php_package is not skipped or (_php_package_stat.stat.exists and not php_installed_stat.stat.exists)
+        - _php_package is not skipped and not php_installed_stat.stat.exists
 
     - name: Compile and Install
       shell: "{{ php_build_parameters }}"
