@@ -1,0 +1,42 @@
+---
+- name: Verify that libzip is installed
+  stat:
+    path: /usr/local/libzip
+  register: libzip_install_stat
+
+- name: Download libzip package
+  get_url:
+    url: "{{ php_libzip_download_url }}"
+    dest: "{{ role_path }}/files/"
+    timeout: 120
+  become: false
+  run_once: true
+  delegate_to: localhost
+  register: _php_libzip_package
+  when:
+    - not libzip_install_stat.stat.exists
+
+- name: Unarchive libzip
+  unarchive:
+    src: "files/{{ php_libzip_download_url | basename }}"
+    dest: /usr/local/src
+    creates: /usr/local/src/libzip-{{ php_libzip_version }}
+    remote_src: false
+  register: libzip_unarchive
+  when:
+    - not libzip_install_stat.stat.exists
+    - _php_libzip_package is not skipped
+
+- name: Install libzip
+  shell: "{{ item }}"
+  args:
+    chdir: /usr/local/src/libzip-{{ php_libzip_version }}
+  loop:
+    - ./configure --prefix=/usr/local/libzip
+    - make
+    - make install
+  when:
+    - libzip_unarchive is changed
+    - php_libzip_version is version("1.4.0", operator="<")
+  tags:
+    - skip_ansible_lint

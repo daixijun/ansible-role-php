@@ -4,27 +4,10 @@
     msg: "php_version must greater 7.0"
   when: php_version is version("7.0", operator="lt", strict=True)
 
-- name: Verify that PHP is installed
-  stat:
-    path: /usr/local/php/bin/php
-  register: php_installed_stat
-
-- name: Get installed version
-  raw: /usr/local/php/bin/php --version | head -1 | awk '{print $2}'
-  register: get_php_installed_version
-  changed_when: false
-  when:
-    - php_installed_stat.stat.exists
-  tags:
-    - skip_ansible_lint
-
-- name: Set php_installed_version fact
-  set_fact:
-    php_installed_version: "{{ get_php_installed_version.stdout.strip() }}"
-  when:
-    - php_installed_stat.stat.exists
-    - get_php_installed_version is defined
-    - "'stdout' in get_php_installed_version"
+- name: Verify libzip version
+  fail:
+    msg: "Libzip version greater than 1.4 is not currently supported"
+  when: php_libzip_version is version("1.4.0", operator=">=")
 
 - name: Remove installed same version
   file:
@@ -32,16 +15,16 @@
     state: absent
   when:
     - php_force_install|bool
-    - php_installed_version is defined
-    - php_installed_version is version(php_version, operator="eq", strict=True)
+    - ansible_local.php.version is defined
+    - ansible_local.php.version is version(php_version, operator="eq", strict=True)
   tags:
     - skip_ansible_lint
 
 - name: Message for PHP already installed
   fail:
-    msg: "expected version {{ php_version }} but {{ php_installed_version }} already installed. set php_force_install=true parameter to force reinstall"
+    msg: "expected version {{ php_version }} but {{ ansible_local.php.version }} already installed. set php_force_install=true parameter to force reinstall"
   when:
-    - php_installed_stat.stat.exists
+    # - php_installed_stat.stat.exists
     - not php_force_install
-    - php_installed_version is defined
-    - not php_installed_version is version(php_version, operator="eq", strict=True)
+    - ansible_local.php.version is defined
+    - not ansible_local.php.version is version(php_version, operator="eq", strict=True)

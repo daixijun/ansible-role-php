@@ -1,203 +1,156 @@
 ---
-- block:
-    - import_tasks: prepare.yaml
+- import_tasks: prepare.yaml
 
-    - name: Install dependencies
-      yum:
-        name: "{{ php_dependencies }}"
-        state: installed
-      async: 1000
-      poll: 0
-      changed_when: False
-      register: yum_sleeper
+- name: Install dependencies
+  yum:
+    name: "{{ php_dependencies }}"
+    state: installed
+  async: 1000
+  poll: 0
+  changed_when: False
+  register: yum_sleeper
 
-    - name: Wait for dependencies install complete
-      async_status:
-        jid: "{{ yum_sleeper.ansible_job_id }}"
-      register: yum_sleeper_job_result
-      until: yum_sleeper_job_result.finished
-      retries: 300
-      when:
-        - yum_sleeper is not skipped
+- name: Wait for dependencies install complete
+  async_status:
+    jid: "{{ yum_sleeper.ansible_job_id }}"
+  register: yum_sleeper_job_result
+  until: yum_sleeper_job_result.finished
+  retries: 300
+  when:
+    - yum_sleeper is not skipped
 
-    - name: Ensure {{ php_web_user }} group exists
-      group:
-        name: "{{ php_web_user }}"
-        system: yes
-        state: present
-      tags:
-        - user
+- name: Ensure {{ php_web_user }} group exists
+  group:
+    name: "{{ php_web_user }}"
+    system: yes
+    state: present
+  tags:
+    - user
 
-    - name: Ensure {{ php_web_user }} user exists
-      user:
-        name: "{{ php_web_user }}"
-        shell: /sbin/nologin
-        home: /var/cache/nginx
-        group: "{{ php_web_user }}"
-        system: yes
-        move_home: yes
-        state: present
-      tags:
-        - user
+- name: Ensure {{ php_web_user }} user exists
+  user:
+    name: "{{ php_web_user }}"
+    shell: /sbin/nologin
+    home: /var/cache/nginx
+    group: "{{ php_web_user }}"
+    system: yes
+    move_home: yes
+    state: present
+  tags:
+    - user
 
-    - name: Verify that libzip is installed
-      stat:
-        path: /usr/local/libzip
-      register: libzip_install_stat
+- name: Include install libzip task
+  include_tasks: install_libzip.yaml
 
-    - name: Download libzip package
-      get_url:
-        url: "{{ php_libzip_download_url }}"
-        dest: "{{ role_path }}/files/"
-        timeout: 120
-      async: 120
-      poll: 5
-      become: false
-      run_once: true
-      delegate_to: localhost
-      register: _php_libzip_package
-      when:
-        - not libzip_install_stat.stat.exists
+- name: Download php package
+  get_url:
+    url: "{{ php_download_url }}"
+    dest: "{{ role_path }}/files/"
+    timeout: 120
+  become: false
+  run_once: true
+  delegate_to: localhost
+  when:
+    - ansible_local.php.version is not defined
+  register: _php_package
 
-    - name: Unarchive libzip
-      unarchive:
-        src: "files/{{ php_libzip_download_url | basename }}"
-        dest: /usr/local/src
-        creates: /usr/local/src/libzip-{{ php_libzip_version }}
-        remote_src: false
-      register: libzip_unarchive
-      when:
-        - not libzip_install_stat.stat.exists and _php_libzip_package is not skipped
+- name: Unarchive php-{{ php_version }}
+  unarchive:
+    src: "files/{{ php_download_url | basename }}"
+    dest: /usr/local/src/
+    creates: /usr/local/src/php-{{ php_version }}
+    remote_src: false
+  register: php_unarchive
+  when:
+    - _php_package is not skipped and ansible_local.php.version is not defined
 
-    - name: Install libzip
-      shell: "{{ item }}"
-      args:
-        chdir: /usr/local/src/libzip-{{ php_libzip_version }}
-      loop:
-        - ./configure --prefix=/usr/local/libzip
-        - make
-        - make install
-      when:
-        - libzip_unarchive is changed
-      tags:
-        - skip_ansible_lint
+- name: Compile and Install
+  shell: "{{ php_build_parameters }}"
+  args:
+    chdir: /usr/local/src/php-{{ php_version }}
+  async: 1800
+  poll: 0
+  register: php_install_status
+  changed_when: False
+  when:
+    - php_force_install|bool or ansible_local.php.version is not defined
+    - php_unarchive is changed
+  tags:
+    - skip_ansible_lint
 
-    - name: Download php package
-      get_url:
-        url: "{{ php_download_url }}"
-        dest: "{{ role_path }}/files/"
-        timeout: 120
-      async: 120
-      poll: 5
-      become: false
-      run_once: true
-      delegate_to: localhost
-      when:
-        - not php_installed_stat.stat.exists
-      register: _php_package
+- name: Wait for complie/install complete
+  async_status:
+    jid: "{{ php_install_status.ansible_job_id }}"
+  register: php_install_poll_status
+  until: php_install_poll_status.finished
+  retries: 600
+  when:
+    - php_install_status is not skipped
 
-    - name: Unarchive php-{{ php_version }}
-      unarchive:
-        src: "files/{{ php_download_url | basename }}"
-        dest: /usr/local/src/
-        creates: /usr/local/src/php-{{ php_version }}
-        remote_src: false
-      register: php_unarchive
-      when:
-        - _php_package is not skipped and not php_installed_stat.stat.exists
+- name: Ensure log && configuration directory
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ php_web_user }}"
+    group: "{{ php_web_user }}"
+    mode: "755"
+  loop:
+    - "{{ php_log_path }}"
+    - "{{ php_fpm_pid | dirname }}"
+    - "/usr/local/php-{{ php_version }}/etc/php.d"
+    - "/usr/local/php-{{ php_version }}/etc/php-fpm.d"
 
-    - name: Compile and Install
-      shell: "{{ php_build_parameters }}"
-      args:
-        chdir: /usr/local/src/php-{{ php_version }}
-      async: 1800
-      poll: 0
-      register: php_install_status
-      changed_when: False
-      when:
-        - php_force_install|bool or not php_installed_stat.stat.exists
-        - php_unarchive is changed
-      tags:
-        - skip_ansible_lint
+- name: Copy php-fpm configuration files
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+  loop:
+    - src: php.ini.j2
+      dest: /usr/local/php-{{ php_version }}/etc/php.ini
+    - src: php-fpm.conf.j2
+      dest: /usr/local/php-{{ php_version }}/etc/php-fpm.conf
+    - src: www.conf.j2
+      dest: /usr/local/php-{{ php_version }}/etc/php-fpm.d/www.conf
+  diff: true
+  notify:
+    - restart php-fpm
 
-    - name: Wait for complie/install complete
-      async_status:
-        jid: "{{ php_install_status.ansible_job_id }}"
-      register: php_install_poll_status
-      until: php_install_poll_status.finished
-      retries: 600
-      when:
-        - php_install_status is not skipped
+- name: Ensure directory permissions
+  file:
+    path: /usr/local/php-{{ php_version }}
+    state: directory
+    owner: "{{ php_web_user }}"
+    group: "{{ php_web_user }}"
+    recurse: yes
 
-    - name: Ensure log && configuration directory
-      file:
-        path: "{{ item }}"
-        state: directory
-        owner: "{{ php_web_user }}"
-        group: "{{ php_web_user }}"
-        mode: "755"
-      loop:
-        - "{{ php_log_path }}"
-        - "{{ php_fpm_pid | dirname }}"
-        - "/usr/local/php-{{ php_version }}/etc/php.d"
-        - "/usr/local/php-{{ php_version }}/etc/php-fpm.d"
+- name: Symlink
+  file:
+    src: /usr/local/php-{{ php_version }}
+    dest: /usr/local/php
+    state: link
+    force: yes
+  when:
+    - php_force_install|bool or ansible_local.php.version is not defined
 
-    - name: Copy php-fpm configuration files
-      template:
-        src: "{{ item.src }}"
-        dest: "{{ item.dest }}"
-      loop:
-        - src: php.ini.j2
-          dest: /usr/local/php-{{ php_version }}/etc/php.ini
-        - src: php-fpm.conf.j2
-          dest: /usr/local/php-{{ php_version }}/etc/php-fpm.conf
-        - src: www.conf.j2
-          dest: /usr/local/php-{{ php_version }}/etc/php-fpm.d/www.conf
-      diff: true
-      notify:
-        - restart php-fpm
+- name: Startup for systemd
+  template:
+    src: php-fpm.service.j2
+    dest: /usr/lib/systemd/system/php-fpm.service
+  diff: true
 
-    - name: Ensure directory permissions
-      file:
-        path: /usr/local/php-{{ php_version }}
-        state: directory
-        owner: "{{ php_web_user }}"
-        group: "{{ php_web_user }}"
-        recurse: yes
+- name: Ensure php-fpm.service started
+  systemd:
+    name: php-fpm.service
+    state: started
+    enabled: yes
+    daemon_reload: yes
 
-    - name: Symlink
-      file:
-        src: /usr/local/php-{{ php_version }}
-        dest: /usr/local/php
-        state: link
-        force: yes
-      when:
-        - php_force_install|bool or not php_installed_stat.stat.exists
+- import_tasks: post_task.yaml
 
-    - name: Startup for systemd
-      template:
-        src: php-fpm.service.j2
-        dest: /usr/lib/systemd/system/php-fpm.service
-      diff: true
-
-    - name: Ensure php-fpm.service started
-      systemd:
-        name: php-fpm.service
-        state: started
-        enabled: yes
-        daemon_reload: yes
-
-    - import_tasks: post_task.yaml
-  rescue:
-    - name: Clean failed version
-      file:
-        path: /usr/local/php-{{ php_version }}
-        state: absent
-  always:
-    - name: Clean source packages
-      file:
-        path: "{{ item }}"
-        state: absent
-      loop:
-        - /usr/local/src/libzip-{{ php_libzip_version }}
-        - /usr/local/src/php-{{ php_version }}
+- name: Clean source packages
+  file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - /usr/local/src/libzip-{{ php_libzip_version }}
+    - /usr/local/src/php-{{ php_version }}
