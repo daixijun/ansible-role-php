@@ -15,5 +15,5 @@
 
 - name: Render php local fact
   template:
-    src: local_facts.yaml.j2
+    src: local_facts.fact.j2
     dest: /etc/ansible/facts.d/php.fact

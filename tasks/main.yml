@@ -49,6 +49,9 @@
       get_url:
         url: "{{ php_libzip_download_url }}"
         dest: "{{ role_path }}/files/"
+        timeout: 120
+      async: 120
+      poll: 5
       become: false
       run_once: true
       delegate_to: localhost
@@ -83,6 +86,9 @@
       get_url:
         url: "{{ php_download_url }}"
         dest: "{{ role_path }}/files/"
+        timeout: 120
+      async: 120
+      poll: 5
       become: false
       run_once: true
       delegate_to: localhost
