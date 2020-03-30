@@ -5,12 +5,8 @@ jobs:
   test:
     runs-on: ubuntu-latest
     strategy:
-      max-parallel: 4
       matrix:
-        python-version: [2.7, 3.5, 3.6, 3.7]
-    services:
-      docker:
-        image: docker:18-dind
+        python-version: [3.7]
     steps:
       - name: Checkout
         uses: actions/checkout@v1
@@ -22,11 +18,14 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install ansible molecule docker
-          pip install --upgrade testinfra
+          pip install ansible "molecule[docker,lint]"
       - name: Test with molecule
         run: |
           cd ..
-          mv ansible-role-php daixijun.php
+          cp -rf ansible-role-php daixijun.php
           cd daixijun.php
           molecule test
+      - name: Publish role to Galaxy
+        if: success()
+        run: |
+          ansible-galaxy role import --api-key ${{ secrets.ANSIBLE_GALAXY_API_KEY }} $(echo $GITHUB_REPOSITORY | cut -d/ -f1) $(echo $GITHUB_REPOSITORY | cut -d/ -f2)
