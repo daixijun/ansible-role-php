@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.2.0](https://github.com/daixijun/ansible-role-php/compare/v0.1.22...v0.2.0) (2020-03-30)
+
+
+### ⚠ BREAKING CHANGES
+
+* 不会再移除安装失败的版本
+
+### Features
+
+* 升级默认php版本为 7.3.13, 升级默认 libzip 版本为 1.6.1 ([bc9aadc](https://github.com/daixijun/ansible-role-php/commit/bc9aadcee748a09eb5992e49b412d48e31280bce))
+* 添加本地facts ([308addc](https://github.com/daixijun/ansible-role-php/commit/308addc658de9480e38b7640d677332daad7c6ce))
+
+
+### Bug Fixes
+
+* 不再移除安装失败的版本 ([b648a71](https://github.com/daixijun/ansible-role-php/commit/b648a71ca243104f029d5a0ec28481c700d5adce))
+* 修复php安装包下载地址为sohu镜像站 ([29cd333](https://github.com/daixijun/ansible-role-php/commit/29cd3334e62451b539ea2d55a5f8261d241e256c))
+* 修改local facts格式为json ([d4b79b9](https://github.com/daixijun/ansible-role-php/commit/d4b79b9775fd5b72205016719461dd9cac354546))
+* 修改local facts格式为json ([4999516](https://github.com/daixijun/ansible-role-php/commit/49995165de1c9ff23ac502e1143c03e0e36f4b01))
+
 ### [0.1.22](https://github.com/daixijun/ansible-role-php/compare/v0.1.21...v0.1.22) (2020-01-05)
 
 
