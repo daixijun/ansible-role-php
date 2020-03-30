@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.1](https://github.com/daixijun/ansible-role-php/compare/v0.2.0...v0.2.1) (2020-03-30)
+
+
+### Bug Fixes
+
+* refresh ansible_local facts ([7090c34](https://github.com/daixijun/ansible-role-php/commit/7090c34ca2aab122487adeb05f4a9f49c8343c81))
+
 ## [0.2.0](https://github.com/daixijun/ansible-role-php/compare/v0.1.22...v0.2.0) (2020-03-30)
 
 
