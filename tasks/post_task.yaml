@@ -7,6 +7,13 @@
   tags:
     - skip_ansible_lint
 
-- name: Set extension_dir fact
-  set_fact:
-    php_extension_dir: "{{ get_extension_dir.stdout.strip() }}"
+- name: Ensure facts directory
+  file:
+    path: /etc/ansible/facts.d
+    state: directory
+    recurse: true
+
+- name: Render php local fact
+  template:
+    src: local_facts.yaml.j2
+    dest: /etc/ansible/facts.d/php.fact
