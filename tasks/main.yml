@@ -93,6 +93,7 @@
     state: directory
     owner: "{{ php_web_user }}"
     group: "{{ php_web_user }}"
+    recurse: True
     mode: "755"
   loop:
     - "{{ php_log_path }}"
@@ -104,6 +105,8 @@
   template:
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"
+    owner: "{{ php_web_user }}"
+    group: "{{ php_web_user }}"
   loop:
     - src: php.ini.j2
       dest: /usr/local/php-{{ php_version }}/etc/php.ini
@@ -111,17 +114,19 @@
       dest: /usr/local/php-{{ php_version }}/etc/php-fpm.conf
     - src: www.conf.j2
       dest: /usr/local/php-{{ php_version }}/etc/php-fpm.d/www.conf
-  diff: true
   notify:
     - restart php-fpm
 
 - name: Ensure directory permissions
   file:
-    path: /usr/local/php-{{ php_version }}
+    path: "{{ item }}"
     state: directory
     owner: "{{ php_web_user }}"
     group: "{{ php_web_user }}"
     recurse: yes
+  loop:
+    - /usr/local/libzip
+    - /usr/local/php-{{ php_version }}
 
 - name: Symlink
   file:
@@ -136,14 +141,8 @@
   template:
     src: php-fpm.service.j2
     dest: /usr/lib/systemd/system/php-fpm.service
-  diff: true
-
-- name: Ensure php-fpm.service started
-  systemd:
-    name: php-fpm.service
-    state: started
-    enabled: yes
-    daemon_reload: yes
+  notify:
+    - restart php-fpm
 
 - import_tasks: post_task.yaml
 
