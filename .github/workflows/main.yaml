@@ -7,6 +7,7 @@ jobs:
     strategy:
       matrix:
         python-version: [3.7]
+        php-version: [7.2.30, 7.3.17, 7.4.5]
     steps:
       - name: Checkout
         uses: actions/checkout@v1
@@ -24,7 +25,7 @@ jobs:
           cd ..
           cp -rf ansible-role-php daixijun.php
           cd daixijun.php
-          molecule test
+          PHP_VERSION=${{ matrix.php-version }} molecule test
       - name: Publish role to Galaxy
         if: success()
         run: |
