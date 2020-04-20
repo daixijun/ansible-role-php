@@ -7,7 +7,7 @@ jobs:
     strategy:
       matrix:
         python-version: [3.7]
-        php-version: [7.2.30, 7.3.17, 7.4.5]
+        php-version: [7.2.30, 7.3.17]
     steps:
       - name: Checkout
         uses: actions/checkout@v1
