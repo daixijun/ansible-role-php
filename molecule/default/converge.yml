@@ -3,5 +3,5 @@
   hosts: all
   roles:
     - role: daixijun.php
-      php_version: 7.3.13
+      # php_version: 7.3.13
       # php_force_install: true
