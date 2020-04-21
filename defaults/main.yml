@@ -21,7 +21,7 @@ php_fpm_listen: 127.0.0.1:9000
 php_fpm_listen_backlog: 511
 php_fpm_listen_allowed_clients: 127.0.0.1
 php_fpm_pm: dynamic # static
-php_fpm_pm_max_children: 50
+# php_fpm_pm_max_children: 50  # 默认值为内存总大小/30M取整，尽量不要手动修改
 php_fpm_pm_start_servers: 2
 php_fpm_pm_min_spare_servers: 1
 php_fpm_pm_max_spare_servers: 3
