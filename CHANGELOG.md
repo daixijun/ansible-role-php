@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.2](https://github.com/daixijun/ansible-role-php/compare/v0.2.1...v0.2.2) (2020-04-21)
+
+
+### Features
+
+* 添加 php 安装包 checksum 支持 ([e5528d0](https://github.com/daixijun/ansible-role-php/commit/e5528d048603db7aca28db325a0c2f33379f3e9d))
+
+
+### Bug Fixes
+
+* 修复目录权限幂等性问题 ([14ac388](https://github.com/daixijun/ansible-role-php/commit/14ac38874d6ea3ed08f7e4681fbc97cc6ee68273))
+* **php:** 添加 pm.max_children 默认值计算公式 ([75ab907](https://github.com/daixijun/ansible-role-php/commit/75ab9079c6474d7581e1c3a25f99029de361f324))
+* 修复 libzip 目录权限 ([ab4125c](https://github.com/daixijun/ansible-role-php/commit/ab4125cffc724c27919840d70adc33b6b555fde7))
+* 修改安装包存放路径 ([f0db6e1](https://github.com/daixijun/ansible-role-php/commit/f0db6e11857b8421bb1ed905e133334088163918))
+
 ### [0.2.1](https://github.com/daixijun/ansible-role-php/compare/v0.2.0...v0.2.1) (2020-03-30)
 
 
