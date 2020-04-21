@@ -93,15 +93,14 @@
     state: directory
     owner: "{{ php_web_user }}"
     group: "{{ php_web_user }}"
-    recurse: True
-    mode: "755"
+    mode: 0755
   loop:
     - "{{ php_log_path }}"
     - "{{ php_fpm_pid | dirname }}"
     - "/usr/local/php-{{ php_version }}/etc/php.d"
     - "/usr/local/php-{{ php_version }}/etc/php-fpm.d"
 
-- name: Copy php-fpm configuration files
+- name: Generator php configuration files
   template:
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"

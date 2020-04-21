@@ -8,6 +8,7 @@
   get_url:
     url: "{{ php_libzip_download_url }}"
     dest: "{{ playbook_dir }}/files/{{ php_libzip_download_url|basename }}"
+    checksum: md5:{{ php_libzip_checksums[php_libzip_version] }}
     timeout: 120
   become: false
   run_once: true
@@ -21,6 +22,8 @@
     src: "files/{{ php_libzip_download_url | basename }}"
     dest: /usr/local/src
     creates: /usr/local/src/libzip-{{ php_libzip_version }}
+    owner: "{{ php_web_user }}"
+    group: "{{ php_web_user }}"
     remote_src: false
   register: libzip_unarchive
   when:
