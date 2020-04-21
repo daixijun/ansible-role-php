@@ -46,6 +46,7 @@
   get_url:
     url: "{{ php_download_url }}"
     dest: "{{ playbook_dir }}/files/{{ php_download_url | basename }}"
+    checksum: sha256:{{ php_checksums[php_version] }}
     timeout: 120
   become: false
   run_once: true
