@@ -1,5 +1,75 @@
 ---
-# vars file for php
+php_dependencies:
+  - gcc
+  - re2c
+  - gcc-c++
+  - autoconf
+  - automake
+  - make
+  - bison
+  - bison-devel
+  - libxml2-devel
+  - bzip2-devel
+  - libzip-devel
+  - libcurl-devel
+  - openjpeg-devel
+  - libpng-devel
+  - libXpm-devel
+  - libmcrypt-devel
+  - readline-devel
+  - openssl-devel
+  - freetype-devel
+  - msgpack-devel
+  - libacl-devel
+  - gd-devel
+  - libwebp-devel
+  - bison-devel
+  - libevent-devel
+  - systemd-devel
+  - libicu-devel
+  - mariadb-devel
+php_build_parameters: |
+  ./configure --prefix=/usr/local/php-{{ php_version }} \
+    --with-fpm-acl \
+    --with-fpm-systemd \
+    --enable-intl \
+    --enable-mbstring \
+    --enable-fpm \
+    --enable-pdo \
+    --disable-debug \
+    --with-bz2 \
+    --with-zlib \
+    --enable-mbregex \
+    --enable-bcmath \
+    --with-mhash \
+    --enable-zip \
+    --enable-wddx \
+    --with-libzip=/usr/local/libzip/ \
+    --with-pcre-regex \
+    --with-gd \
+    --with-mysqli \
+    --with-pdo-mysql \
+    --enable-mysqlnd \
+    --without-sqlite3 \
+    --without-pdo-sqlite \
+    --enable-xml \
+    --with-gettext \
+    --with-curl \
+    --enable-opcache \
+    --with-iconv \
+    --with-readline \
+    --enable-dba \
+    --enable-ftp \
+    --enable-soap \
+    --enable-pcntl \
+    --with-openssl \
+    --with-fpm-user={{ php_web_user }} \
+    --with-fpm-group={{ php_web_user }} \
+    --with-config-file-scan-dir=/usr/local/php-{{ php_version }}/etc/php.d \
+    --with-config-file-path=/usr/local/php-{{ php_version }}/etc && \
+  make && \
+  make install
+
 php_libzip_checksums:
   1.3.0: 8921860aa46437b6a017928f694014b9
   1.3.1: d231a10881e383bcdea1c401f8842ff1
