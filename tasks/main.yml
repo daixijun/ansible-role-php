@@ -5,19 +5,6 @@
   yum:
     name: "{{ php_dependencies }}"
     state: installed
-  async: 1000
-  poll: 0
-  changed_when: False
-  register: yum_sleeper
-
-- name: Wait for dependencies install complete
-  async_status:
-    jid: "{{ yum_sleeper.ansible_job_id }}"
-  register: yum_sleeper_job_result
-  until: yum_sleeper_job_result.finished
-  retries: 300
-  when:
-    - yum_sleeper is not skipped
 
 - name: Ensure {{ php_web_user }} group exists
   group:
@@ -46,7 +33,7 @@
   get_url:
     url: "{{ php_download_url }}"
     dest: "{{ playbook_dir }}/files/{{ php_download_url | basename }}"
-    checksum: sha256:{{ php_checksums[php_version] }}
+    # checksum: sha256:{{ php_checksums[php_version] }}
     timeout: 120
   become: false
   run_once: true
@@ -94,7 +81,7 @@
     state: directory
     owner: "{{ php_web_user }}"
     group: "{{ php_web_user }}"
-    mode: 0755
+    mode: "0755"
   loop:
     - "{{ php_log_path }}"
     - "{{ php_fpm_pid | dirname }}"

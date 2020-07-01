@@ -8,7 +8,7 @@
   get_url:
     url: "{{ php_libzip_download_url }}"
     dest: "{{ playbook_dir }}/files/{{ php_libzip_download_url|basename }}"
-    checksum: md5:{{ php_libzip_checksums[php_libzip_version] }}
+    # checksum: md5:{{ php_libzip_checksums[php_libzip_version] }}
     timeout: 120
   become: false
   run_once: true
