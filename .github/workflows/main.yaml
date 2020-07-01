@@ -2,36 +2,21 @@
 name: build
 on: push
 jobs:
-  test:
+  molecule:
+    env:
+      PY_COLORS: 1 # allows molecule colors to be passed to GitHub Actions
+      ANSIBLE_FORCE_COLOR: 1 # allows ansible colors to be passed to GitHub Actions
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: [3.7]
-        php-version:
-          - 7.1.30
-          - 7.1.31
-          - 7.1.32
-          - 7.1.33
-          - 7.2.23
-          - 7.2.24
-          - 7.2.25
-          - 7.2.26
-          - 7.2.27
-          - 7.2.28
-          - 7.2.29
-          - 7.2.30
-          - 7.3.13
-          - 7.3.14
-          - 7.3.15
-          - 7.3.16
-          - 7.3.17
+    # strategy:
+    #   matrix:
+    #     python-version: [3.x]
     steps:
       - name: Checkout
         uses: actions/checkout@v1
-      - name: Set up Python ${{ matrix.python-version }}
+      - name: Set up Python 3.x
         uses: actions/setup-python@v1
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: 3.x
           architecture: x64
       - name: Install dependencies
         run: |
@@ -40,9 +25,9 @@ jobs:
       - name: Test with molecule
         run: |
           cd ..
-          cp -rf ansible-role-php daixijun.php
+          ln -sf ansible-role-php daixijun.php
           cd daixijun.php
-          PHP_VERSION=${{ matrix.php-version }} molecule test
+          molecule test
       - name: Publish role to Galaxy
         if: success()
         run: |
