@@ -28,7 +28,3 @@ jobs:
           ln -sf ansible-role-php daixijun.php
           cd daixijun.php
           molecule test
-      - name: Publish role to Galaxy
-        if: success()
-        run: |
-          ansible-galaxy role import --api-key ${{ secrets.ANSIBLE_GALAXY_API_KEY }} $(echo $GITHUB_REPOSITORY | cut -d/ -f1) $(echo $GITHUB_REPOSITORY | cut -d/ -f2)
