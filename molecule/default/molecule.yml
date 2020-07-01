@@ -6,10 +6,10 @@ driver:
 lint: |
   set -ex
   yamllint .
-  ansible-lint .
+  ansible-lint -v
 platforms:
-  - name: instance
-    image: geerlingguy/docker-centos7-ansible
+  - name: php
+    image: geerlingguy/docker-${MOLECULE_DISTRO:-centos7}-ansible
     command: ""
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
@@ -17,7 +17,8 @@ platforms:
     pre_build_image: true
 provisioner:
   name: ansible
-  ansible_args:
-    - --extra-vars=php_version=${PHP_VERSION:-7.3.13}
+  config_options:
+    defaults:
+      verbosity: 2
 verifier:
   name: ansible

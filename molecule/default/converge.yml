@@ -1,5 +1,7 @@
 ---
 - name: Converge
   hosts: all
+  any_errors_fatal: true
   roles:
     - role: daixijun.php
+      php_version: 7.3.18
