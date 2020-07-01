@@ -66,6 +66,4 @@ php_build_parameters: |
     --with-fpm-user={{ php_web_user }} \
     --with-fpm-group={{ php_web_user }} \
     --with-config-file-scan-dir=/usr/local/php-{{ php_version }}/etc/php.d \
-    --with-config-file-path=/usr/local/php-{{ php_version }}/etc && \
-  make && \
-  make install
+    --with-config-file-path=/usr/local/php-{{ php_version }}/etc

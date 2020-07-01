@@ -28,3 +28,29 @@
     - not php_force_install
     - ansible_local.php.version is defined
     - not ansible_local.php.version is version(php_version, operator="eq", strict=True)
+
+- name: Install dependencies
+  package:
+    name: "{{ php_dependencies }}"
+    state: present
+    update_cache: yes
+
+- name: Ensure {{ php_web_user }} group exists
+  group:
+    name: "{{ php_web_user }}"
+    system: yes
+    state: present
+  tags:
+    - user
+
+- name: Ensure {{ php_web_user }} user exists
+  user:
+    name: "{{ php_web_user }}"
+    shell: /sbin/nologin
+    home: /var/cache/nginx
+    group: "{{ php_web_user }}"
+    system: yes
+    move_home: yes
+    state: present
+  tags:
+    - user

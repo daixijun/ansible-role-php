@@ -1,0 +1,8 @@
+---
+- name: Clean source packages
+  file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - /usr/local/src/libzip-{{ php_libzip_version }}
+    - /usr/local/src/php-{{ php_version }}

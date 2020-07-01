@@ -1,0 +1,114 @@
+---
+- name: Download php package
+  get_url:
+    url: "{{ php_download_url }}"
+    dest: "{{ playbook_dir }}/files/{{ php_download_url | basename }}"
+    # checksum: sha256:{{ php_checksums[php_version] }}
+    timeout: 120
+  become: false
+  run_once: true
+  delegate_to: localhost
+  when:
+    - ansible_local.php.version is not defined
+  register: _php_package
+
+- name: Unarchive php-{{ php_version }}
+  unarchive:
+    src: "files/{{ php_download_url | basename }}"
+    dest: /usr/local/src/
+    creates: /usr/local/src/php-{{ php_version }}
+    remote_src: false
+  register: _php_unarchive
+  when:
+    - _php_package is not skipped and ansible_local.php.version is not defined
+
+- name: Configure
+  shell: "{{ php_build_parameters }}"
+  args:
+    chdir: /usr/local/src/php-{{ php_version }}
+    removes: /usr/local/src/php-{{ php_version }}
+  register: php_install_status
+  when:
+    - php_force_install|bool or ansible_local.php.version is not defined
+    - _php_unarchive is changed
+  tags:
+    - skip_ansible_lint
+
+- name: Make
+  make:
+    chdir: /usr/local/src/php-{{ php_version }}
+  when:
+    - php_install_status is changed
+
+- name: Make install
+  make:
+    target: install
+    chdir: /usr/local/src/php-{{ php_version }}
+  become: true
+  when:
+    - php_install_status is changed
+
+# - name: Wait for complie/install complete
+#   async_status:
+#     jid: "{{ php_install_status.ansible_job_id }}"
+#   register: php_install_poll_status
+#   until: php_install_poll_status.finished
+#   retries: 600
+#   when:
+#     - php_install_status is not skipped
+
+- name: Ensure log && configuration directory
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ php_web_user }}"
+    group: "{{ php_web_user }}"
+    mode: "0755"
+  loop:
+    - "{{ php_log_path }}"
+    - "{{ php_fpm_pid | dirname }}"
+    - "/usr/local/php-{{ php_version }}/etc/php.d"
+    - "/usr/local/php-{{ php_version }}/etc/php-fpm.d"
+
+- name: Generator php configuration files
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: "{{ php_web_user }}"
+    group: "{{ php_web_user }}"
+  loop:
+    - src: php.ini.j2
+      dest: /usr/local/php-{{ php_version }}/etc/php.ini
+    - src: php-fpm.conf.j2
+      dest: /usr/local/php-{{ php_version }}/etc/php-fpm.conf
+    - src: www.conf.j2
+      dest: /usr/local/php-{{ php_version }}/etc/php-fpm.d/www.conf
+  notify:
+    - restart php-fpm
+
+- name: Ensure directory permissions
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ php_web_user }}"
+    group: "{{ php_web_user }}"
+    recurse: yes
+  loop:
+    - /usr/local/libzip
+    - /usr/local/php-{{ php_version }}
+
+- name: Symlink
+  file:
+    src: /usr/local/php-{{ php_version }}
+    dest: /usr/local/php
+    state: link
+    force: yes
+  when:
+    - php_force_install|bool or ansible_local.php.version is not defined
+
+- name: Startup for systemd
+  template:
+    src: php-fpm.service.j2
+    dest: /usr/lib/systemd/system/php-fpm.service
+  notify:
+    - restart php-fpm
